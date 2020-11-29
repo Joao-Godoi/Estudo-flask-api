@@ -15,7 +15,7 @@ class User(Resource):
     def get(self, user_id):
         user = UserModel.find_user(user_id)
         if user:
-            return user.json()
+            return user.json(), 200
         return {'Message': 'Not Found!'}, 404
 
     @jwt_required
@@ -27,9 +27,9 @@ class User(Resource):
             except Exception:
                 return {'Message': 'An internal error occurred!'
                         'Please try again!'}, 500
-            return {'Message': 'Hotel deleted!'}, 200
+            return {'Message': 'User deleted!'}, 200
 
-        return {'Message': 'Hotel not found!'}, 404
+        return {'Message': 'User not found!'}, 404
 
 
 class UserRegister(Resource):
@@ -52,8 +52,8 @@ class UserLogin(Resource):
 
         if user and safe_str_cmp(user.senha, dados['senha']):
             token = create_access_token(identity=user.user_id)
-            return {'Token': token}
-        return {'Message': 'Email or password is incorrect'}
+            return {'Token': token}, 200
+        return {'Message': 'Email or password is incorrect'}, 400
 
 
 class UserLogout(Resource):

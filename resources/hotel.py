@@ -36,7 +36,7 @@ class Hotel(Resource):
     def get(self, hotel_id):
         hotel = HotelModel.find_hotel(hotel_id)
         if hotel:
-            return hotel.json()
+            return hotel.json(), 200
         return {'Message': 'Not Found!'}, 404
 
     @jwt_required
@@ -52,7 +52,7 @@ class Hotel(Resource):
             return {'Message': 'An internal error occurred!'
                     'Please try again!'}, 500
 
-        return hotel.json()
+        return hotel.json(), 201
 
     @jwt_required
     def put(self, hotel_id):
