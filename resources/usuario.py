@@ -39,20 +39,28 @@ class UserRegister(Resource):
         if UserModel.find_by_email(dados['email']):
             return {'Message': 'Email already registered'}, 400
 
-        user = UserModel(**dados)
-        user.save_user()
+        try:
+            user = UserModel(**dados)
+            user.save_user()
+        except Exception:
+            return {'Message': 'An internal error occurred!'}, 500
+
         return {'Message': 'User created successfully!'}, 201
 
 
 class UserLogin(Resource):
-    @classmethod
-    def post(cls):
+    def post(self):
         dados = atributos.parse_args()
         user = UserModel.find_by_email(dados['email'])
 
         if user and safe_str_cmp(user.senha, dados['senha']):
-            token = create_access_token(identity=user.user_id)
+            try:
+                token = create_access_token(identity=user.user_id)
+            except Exception:
+                return {'Message': 'An internal error occurred!'
+                        'Please try again!'}, 500
             return {'Token': token}, 200
+
         return {'Message': 'Email or password is incorrect'}, 400
 
 
