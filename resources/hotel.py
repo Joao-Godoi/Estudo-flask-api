@@ -21,6 +21,10 @@ class Hoteis(Resource):
                          dados[chave] is not None}
 
         parametros = HotelModel.normalize_path_params(**dados_validos)
+        hoteis = HotelModel.consulta_com_filtros(parametros)
+        if len(hoteis) == 0:
+            return {'message': 'Not Found Hoteis'}, 404
+
         return {"hoteis": HotelModel.consulta_com_filtros(parametros)}
 
 
@@ -33,8 +37,8 @@ class Hotel(Resource):
     argumentos.add_argument('cidade', type=str, required=True,
                             help='Cannot be empty')
 
-    def get(self, hotel_id):
-        hotel = HotelModel.find_hotel(hotel_id)
+    def get(self, nome):
+        hotel = HotelModel.find_hotel(nome)
         if hotel:
             return hotel.json(), 200
         return {'Message': 'Not Found!'}, 404
@@ -69,7 +73,7 @@ class Hotel(Resource):
 
         novo_hotel = HotelModel(hotel_id, **dados)
         try:
-            hotel.save_hotel()
+            novo_hotel.save_hotel()
         except Exception:
             return {'Message': 'An internal error occurred!'
                     'Please try again!'}, 500

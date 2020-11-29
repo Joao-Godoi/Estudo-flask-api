@@ -31,7 +31,7 @@ def invalid_token():
 
 
 api.add_resource(Hoteis, '/hoteis')
-api.add_resource(Hotel, '/hoteis/<int:hotel_id>')
+api.add_resource(Hotel, '/hoteis/<string:nome>', '/hoteis/<int:hotel_id>')
 api.add_resource(User, '/usuarios/<int:user_id>')
 api.add_resource(UserRegister, '/cadastro')
 api.add_resource(UserLogin, '/login')

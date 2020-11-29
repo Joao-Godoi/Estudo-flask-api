@@ -27,8 +27,11 @@ class HotelModel(banco.Model):
         }
 
     @classmethod
-    def find_hotel(cls, hotel_id):
-        hotel = cls.query.filter_by(hotel_id=hotel_id).first()
+    def find_hotel(cls, parametro):
+        if type(parametro) == str:
+            hotel = cls.query.filter_by(nome=parametro).first()
+        else:
+            hotel = cls.query.filter_by(hotel_id=parametro).first()
         if hotel:
             return hotel
         return None
