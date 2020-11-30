@@ -45,7 +45,7 @@ class UserRegister(Resource):
         except Exception:
             return {'Message': 'An internal error occurred!'}, 500
 
-        return {'Message': 'User created successfully!'}, 201
+        return {'Message': 'User created successfully!', 'Dados': user.json()}, 201
 
 
 class UserLogin(Resource):

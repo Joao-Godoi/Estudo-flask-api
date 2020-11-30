@@ -63,21 +63,14 @@ class Hotel(Resource):
         dados = Hotel.argumentos.parse_args()
         hotel = HotelModel.find_hotel(hotel_id)
         if hotel:
-            hotel.update_hotel(**dados)
             try:
+                hotel.update_hotel(**dados)
                 hotel.save_hotel()
             except Exception:
                 return {'Message': 'An internal error occurred!'
                         'Please try again!'}, 500
             return hotel.json(), 200
-
-        novo_hotel = HotelModel(hotel_id, **dados)
-        try:
-            novo_hotel.save_hotel()
-        except Exception:
-            return {'Message': 'An internal error occurred!'
-                    'Please try again!'}, 500
-        return novo_hotel.json(), 201
+        return {'Message': 'Hotel not found!'}, 404
 
     @jwt_required
     def delete(self, hotel_id):

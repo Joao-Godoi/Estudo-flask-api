@@ -1,0 +1,662 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: Flask API
+  description: |
+    API criada com o intuito de estudar e entender sobre Flask, criação de
+    API's utilizando Flask RESTful e documentação de API's utilizando
+    o padrão OPENAPI e o Swagger Editor.
+
+    Pequena API onde se pode criar, pesquisar e deletar hoteis, há também
+    autenticação de usuários para algumas ações, como por exemplo cadastrar
+    um novo hotel.
+  contact:
+    email: jaoo.godoi@gmail.com
+externalDocs:
+  description: Repositório no GitHub
+  url: https://github.com/Joao-Godoi/Estudo-flask-api
+
+tags:
+  - name: Usuário
+    description: Ações relacionadas ao usuário
+
+  - name: Hoteis
+    description: Ações relacionadas aos hoteis
+
+paths:
+  /usuarios/{user_id}:
+    get:
+      parameters:
+      - name: user_id
+        in: path
+        description: User id no path
+        required: true
+        schema:
+          type: integer
+          example: 1
+      tags:
+        - Usuário
+      summary: Visualização de um user específico
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    example: 1
+
+                  email:
+                    type: string
+                    example: email@email.com
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Not Found!"
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+
+    delete:
+      parameters:
+        - name: user_id
+          in: path
+          description: ID do usuário que deseja deletar
+          required: true
+          schema:
+            type: integer
+            example: 1
+      tags:
+        - Usuário
+      summary: Deleção de um usuário
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User deleted!"
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Not Found!"
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+
+  /cadastro:
+    post:
+      tags:
+        - Usuário
+      summary: Cadastro de um novo usuário
+      responses:
+        '201':
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User created successfully!"
+
+                  user_id:
+                    type: integer
+                    example: 1
+
+                  email:
+                    type: string
+                    example: "email@email.com"
+
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: {
+                      "senha": "Cannot be empty."
+                    }
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post_usuario'
+
+  /login:
+    post:
+      tags:
+        - Usuário
+      summary: Login do usuário
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDY2ODkxODcsIm5iZiI6MTYwNjY4OTE4NywianRpIjoiY2ZhMmE0MDAtMmY5Yy00N2FlLThjNzgtNDE4MGIxYTlhYTJmIiwiZXhwIjoxNjA2NjkwMDg3LCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.8dxeIj-88NY_P9HYnSgXN3X6ci5tTJrt5xLK97T0wbI
+
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email or password is incorrect
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post_usuario'
+
+  /logout:
+    post:
+      parameters:
+      - name: user_id
+        in: header
+        description: Token JWT no header
+        required: true
+        schema:
+          type: string
+          example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDY2ODkxODcsIm5iZiI6MTYwNjY4OTE4NywianRpIjoiY2ZhMmE0MDAtMmY5Yy00N2FlLThjNzgtNDE4MGIxYTlhYTJmIiwiZXhwIjoxNjA2NjkwMDg3LCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.8dxeIj-88NY_P9HYnSgXN3X6ci5tTJrt5xLK97T0wbI
+      tags:
+        - Usuário
+      summary: Logout do usuário
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: Logout successfully!
+
+        '401':
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_1:
+                    type: string
+                    example: Token has expired
+                  message_2:
+                      type: string
+                      example: You have been logged out
+                  message_3:
+                      type: string
+                      example: Missing Authorization Header
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post_usuario'
+
+  /hoteis/{nome}:
+    get:
+      parameters:
+        - name: nome
+          in: path
+          description: Nome do hotel a ser consultado
+          required: true
+          schema:
+            type: string
+            example: Plaza Hotel
+      tags:
+        - Hoteis
+      summary: Consulta de hotel específico
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {"hotel_id": "1",
+                          "nome": "Plaza Hotel",
+                          "estrelas": 4.0,
+                          "diaria": 400.0,
+                          "cidade": "Espirito Santo"}
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Not Found!
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+
+  /hoteis:
+    get:
+      parameters:
+        - name: cidade
+          in: query
+          description: Cidade dos hoteis
+          schema:
+            type: string
+            example: /hoteis?cidade=Rio de Janeiro
+
+        - name: estrelas_min
+          in: query
+          description: Número mínimo de estrelas
+          schema:
+            type: number
+            example: /hoteis?estrelas_min=4.5
+
+        - name: estrelas_max
+          in: query
+          description: Número máximo de estrelas
+          schema:
+            type: number
+            example: /hoteis?estrelas_max=4.0
+
+        - name: diaria_min
+          in: query
+          description: Valor mínimo da diária
+          schema:
+            type: number
+            example: /hoteis?diaria_min=100
+
+        - name: diaria_max
+          in: query
+          description: Valor máximo da diária
+          schema:
+            type: number
+            example: /hoteis?diaria_max=400
+
+        - name: limit
+          in: query
+          description: Número máximo de exibição por consulta
+          schema:
+            type: number
+            example: /hoteis?limit=15
+
+        - name: offset
+          in: query
+          description: Número de objetos que serão ignoradas na consulta
+          schema:
+            type: number
+            example: /hoteis?offset=5
+
+      tags:
+        - Hoteis
+      summary: Consulta de diversos hoteis que atendem aos parâmetros
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hoteis:
+                    type: array
+                    example: [{hotel_id: 3,
+                              nome: Beira Mar Hotel,
+                              estrelas: 5.0,
+                              diaria: 500.0,
+                              cidade: Rio de Janeiro},
+                              {hotel_id: 7,
+                              nome: Sol Nascente Hotel,
+                              estrelas: 4.5,
+                              diaria: 400.0,
+                              cidade: Rio de Janeiro}]
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Not Found Hoteis
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+
+  /hoteis/{hotel_id}:
+    post:
+      parameters:
+        - name: hotel_id
+          in: path
+          description: Número do ID no novo hotel
+          required: true
+          schema:
+            type: integer
+            example: 15
+        - name: token
+          in: header
+          description: Token JWT disponibilizado no login do usuário
+          required: true
+          schema:
+            type: string
+            example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDY3MDcxNjIsIm5iZiI6MTYwNjcwNzE2MiwianRpIjoiMzExZmEyMDQtY2I5My00Mzg1LWJjMTktYWY5NjM5ZDIzMGFhIiwiZXhwIjoxNjA2NzA4MDYyLCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.xNFiLT93eHG3D0ZiOInn6rjDCk3W6IF7nZtPvjMTUrk
+
+      tags:
+        - Hoteis
+      summary: Cadastro de um novo hotel
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {"hotel_id": "15",
+                          "nome": "Alfa Hotel",
+                          "estrelas": 4.7,
+                          "diaria": 450.00,
+                          "cidade": "Rio de Janeiro"}
+
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Hotel already exists!
+
+        '401':
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: You have been logged out
+
+        '422':
+          description: UNPROCESSABLE ENTITY
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Signature verification failed
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post_and_put_hotel'
+
+
+    put:
+      parameters:
+        - name: hotel_id
+          in: path
+          description: ID do hotel que deseja alterar
+          required: true
+          schema:
+            type: string
+            example: 12
+        - name: token
+          in: header
+          description: Token JWT disponibilizado no login do usuário
+          required: true
+          schema:
+            type: string
+            example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDY3MDcxNjIsIm5iZiI6MTYwNjcwNzE2MiwianRpIjoiMzExZmEyMDQtY2I5My00Mzg1LWJjMTktYWY5NjM5ZDIzMGFhIiwiZXhwIjoxNjA2NzA4MDYyLCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.xNFiLT93eHG3D0ZiOInn6rjDCk3W6IF7nZtPvjMTUrk
+      tags:
+        - Hoteis
+      summary: Alteração de um hotel já existente
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {"hotel_id": "18",
+                          "nome": "Delta Alterado Hotel",
+                          "estrelas": 4.4,
+                          "diaria": 400.0,
+                          "cidade": "São Paulo"}
+
+        '401':
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: You have been logged out
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Hotel not found!
+
+        '422':
+          description: UNPROCESSABLE ENTITY
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Signature verification failed
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post_and_put_hotel'
+
+
+    delete:
+      parameters:
+          - name: hotel_id
+            in: path
+            description: ID do hotel que deseja deletar
+            required: true
+            schema:
+              type: integer
+              example: 12
+          - name: token
+            in: header
+            description: Token JWT disponibilizado no login do usuário
+            required: true
+            schema:
+              type: string
+              example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MDY3MDcxNjIsIm5iZiI6MTYwNjcwNzE2MiwianRpIjoiMzExZmEyMDQtY2I5My00Mzg1LWJjMTktYWY5NjM5ZDIzMGFhIiwiZXhwIjoxNjA2NzA4MDYyLCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.xNFiLT93eHG3D0ZiOInn6rjDCk3W6IF7nZtPvjMTUrk
+      tags:
+        - Hoteis
+      summary: Deleção de um hotel
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Hotel deleted!
+
+        '401':
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: You have been logged out
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Hotel not found!
+
+        '422':
+          description: UNPROCESSABLE ENTITY
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Signature verification failed
+
+        '500':
+          description: SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_500'
+
+components:
+  schemas:
+    response_500:
+      type: object
+      properties:
+        message:
+          type: string
+          example: An internal error occurred! Please try again!
+
+    post_usuario:
+      type: object
+      properties:
+        email:
+          type: string
+          example: email@email.com
+        senha:
+          type: string
+          example: senha123
+
+    post_and_put_hotel:
+      type: object
+      properties:
+        nome:
+          type: string
+          example: Alfa Hotel
+        estrelas:
+          type: number
+          example: 4.7
+        diaria:
+          type: number
+          example: 450.00
+        cidade:
+          type: string
+          example: Rio de Janeiro
